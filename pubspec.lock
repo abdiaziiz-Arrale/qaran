@@ -198,6 +198,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "4.6.5"
+  glassmorphism:
+    dependency: transitive
+    description:
+      name: glassmorphism
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "3.0.0"
   http:
     dependency: transitive
     description:
@@ -364,6 +371,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.4.12"
+  translucent_navigation_bar:
+    dependency: "direct main"
+    description:
+      name: translucent_navigation_bar
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.0"
   typed_data:
     dependency: transitive
     description:
