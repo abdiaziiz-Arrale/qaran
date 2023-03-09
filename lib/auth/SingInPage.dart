@@ -1,10 +1,14 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:qaran/Home/home.dart';
 import 'package:qaran/auth/SingUpPage.dart';
+
+import 'google.dart';
 
 class SingInScreen extends StatefulWidget {
   const SingInScreen({super.key});
@@ -19,6 +23,9 @@ class _SingInScreenState extends State<SingInScreen> {
   final error= false.obs;
   final empty= false.obs;
   final loading= false.obs;
+  var displayUserName = ''.obs;
+  var displayUserPhoto = ''.obs;
+  var displayUserEmail = ''.obs;
   Future signin() async {
     loading.value = true;
     final auth = FirebaseAuth.instance;
@@ -61,6 +68,79 @@ class _SingInScreenState extends State<SingInScreen> {
       e.message;
       loading.value = false;
     }
+  }
+
+
+  Future signInWithGoogle() async {
+    // Trigger the authentication flow
+    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+
+    // Obtain the auth details from the request
+    final GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
+
+    // Create a new credential
+    final credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth?.accessToken,
+      idToken: googleAuth?.idToken,
+    );
+    displayUserName.value = googleUser!.displayName!;
+    displayUserPhoto.value = googleUser.photoUrl!;
+    displayUserEmail.value = googleUser.email;
+    print("kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk"+  displayUserName.value);
+
+    // Once signed in, return the UserCredential
+     await FirebaseAuth.instance.signInWithCredential(credential);
+    final uid = FirebaseAuth.instance.currentUser!.uid;
+
+
+    final db = FirebaseFirestore.instance;
+    final collection = db.collection('Users');
+    final document = collection.doc(uid);
+    await document.set({
+      'username':   displayUserName.value,
+      'email': displayUserEmail.value,
+      'image': displayUserPhoto.value ,
+      'usertype': "User",
+    });
+    Get.offAll(home());
+return;
+  }
+  //  signingoogle()async{
+  //   print("lllllllllllllllllllllllllllllll");
+  //   final googleUser = await GoogleSignIn(
+  //     signInOption: SignInOption.games,
+  //   ).signIn();
+  //
+  //   final googleAuth = await googleUser?.authentication;
+  //
+  //   if (googleAuth != null) {
+  //     // Create a new credential
+  //     final credential = GoogleAuthProvider.credential(
+  //       accessToken: googleAuth.accessToken,
+  //       idToken: googleAuth.idToken,
+  //     );
+  //
+  //     // Once signed in, return the UserCredential
+  //     await _auth.signInWithCredential(credential);
+  //   }
+  // }
+  void showMessage(String message) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Error"),
+            content: Text(message),
+            actions: [
+              TextButton(
+                child: Text("Ok"),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              )
+            ],
+          );
+        });
   }
   @override
   Widget build(BuildContext context) {
@@ -155,7 +235,8 @@ class _SingInScreenState extends State<SingInScreen> {
                         ),
                         TextButton(
                             onPressed: () {
-                              Get.to(SingUpScreen());
+                              // Get.to(SingUpScreen());
+                              signInWithGoogle();
                             },
                             child: const Text(
                               "SingUp",
@@ -166,9 +247,12 @@ class _SingInScreenState extends State<SingInScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Image.asset(
-                          "assets/google.png",
-                          height: 24,
+                        GestureDetector(
+                          onTap: ()=> signInWithGoogle(),
+                          child: Image.asset(
+                            "assets/google.png",
+                            height: 24,
+                          ),
                         ),
                         const SizedBox(
                           width: 12,
