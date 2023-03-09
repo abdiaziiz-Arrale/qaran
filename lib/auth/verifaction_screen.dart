@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -6,22 +7,65 @@ import 'package:animate_do/animate_do.dart';
 import 'package:flutter_verification_code/flutter_verification_code.dart';
 import 'dart:async';
 
+import 'package:qaran/Home/home.dart';
+
 // import '../profile/profile_setup_screen.dart';
 
 class VerificationScreen extends StatefulWidget {
-  VerificationScreen({
-    Key? key,
-  }) : super(key: key);
+  VerificationScreen(
+      {Key? key, required this.verificationId, required this.phonenumber,required this.email,required this.password,required this.username})
+      : super(key: key);
 
-  // final String verificationId;
-  // final phoneNumber;
-
+  final String verificationId;
+  final String phonenumber;
+  final String username;
+  final String password;
+  final String email;
   @override
   State<VerificationScreen> createState() => _VerificationScreenState();
 }
 
 class _VerificationScreenState extends State<VerificationScreen> {
   String? controller;
+  void signIn() async
+  {
+    _isLoading= true;
+    final auth = FirebaseAuth.instance;
+    final credential = PhoneAuthProvider.credential(
+
+      verificationId: widget.verificationId,
+      smsCode: controller.toString(),
+    );
+
+    try {
+      await auth.signInWithCredential(credential);
+      createuser();
+
+      Get.offAll(home());
+    } catch (e) {
+      // loading.value= false;
+      // error.value= true;
+      print(e);
+    }
+
+  }
+  void createuser ()async {
+    print("kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk");
+    final uid = FirebaseAuth.instance.currentUser!.uid;
+
+
+    final db = FirebaseFirestore.instance;
+    final collection = db.collection('Users');
+    final document = collection.doc(uid);
+    await document.set({
+      'username': widget.username,
+      'email': widget.email,
+      'password': widget.password,
+      'phonenumber': widget.phonenumber,
+      'usertype': "User",
+    });
+  }
+
   // final numberka =;
 
   // void signIn() async {
@@ -191,7 +235,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
                             width: 10,
                           ),
                           Text(
-                            "252 3003837",
+                            widget.phonenumber,
                             textAlign: TextAlign.center,
                             style: TextStyle(
                                 fontSize: 16,
@@ -220,6 +264,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
                         });
                       },
                       onEditing: (value) {},
+
                     ),
                   ),
 
@@ -260,9 +305,9 @@ class _VerificationScreenState extends State<VerificationScreen> {
                     child: MaterialButton(
                       elevation: 0,
                       onPressed: () {
-                        // signIn();
+                        signIn();
                       },
-                      color: Colors.indigo,
+                      color: Colors.black,
                       minWidth: MediaQuery.of(context).size.width * 0.8,
                       height: 50,
                       child: _isLoading

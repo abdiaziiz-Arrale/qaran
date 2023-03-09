@@ -46,6 +46,8 @@ dependencies:
   intl_phone_number_input: ^0.7.0+2
   flutter_verification_code: ^1.1.0
   translucent_navigation_bar: ^1.0.0
+  country_phone_code_picker: ^0.0.43
+  loading_animation_widget: ^1.2.0+4
 
 
 
@@ -80,6 +82,7 @@ flutter:
     - assets/slflag.ico
     - assets/muuse.png
     - assets/google.png
+    - assets/images/R.jpeg
 
   fonts:
     - family: Mulish

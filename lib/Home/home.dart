@@ -1,8 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:get/get.dart';
 import 'package:translucent_navigation_bar/translucent_navigation_bar.dart';
+
+import '../auth/SingInPage.dart';
 
 class home extends StatefulWidget {
   const home({super.key});
@@ -168,6 +171,8 @@ class _homeState extends State<home> {
                                     children: [
                                       GestureDetector(
                                         onTap: () {
+                                          FirebaseAuth.instance.signOut();
+Get.to(SingInScreen());
                                           like.value = !like.value;
                                           print(like.value);
                                         },
